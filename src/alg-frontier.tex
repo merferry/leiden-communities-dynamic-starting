@@ -1,0 +1,46 @@
+\begin{algorithm}[hbtp]
+\caption{Our Parallel \textit{Dynamic Frontier (DF)} Leiden \cite{sahu2024dflouvain}.}
+\label{alg:frontier}
+\begin{algorithmic}[1]
+\Require{$G^{t-1}, G^t$: Previous, current input graph}
+\Require{$\Delta^{t-}, \Delta^{t+}$: Edge deletions and insertions (batch update)}
+\Require{$C^{t-1}, C^t$: Previous, current community of each vertex}
+\Require{$K^{t-1}, K^t$: Previous, current weighted-degree of vertices}
+\Require{$\Sigma^{t-1}, \Sigma^t$: Previous, current total edge weight of communities}
+\Ensure{$\delta V$: Flag vector indicating if each vertex is affected}
+\Ensure{$isAffected(i)$: Is vertex $i$ is marked as affected?}
+\Ensure{$inAffectedRange(i)$: Can $i$ be incrementally marked?}
+\Ensure{$onChange(i)$: What happens if $i$ changes its community?}
+\Ensure{$F$: Lambda functions passed to parallel Leiden (Alg. \ref{alg:leiden})}
+
+\Statex
+
+\Function{dynamicFrontier}{$G^{t-1}, G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1}$}
+  \State $\rhd$ Mark initial affected vertices
+  \ForAll{$(i, j) \in \Delta^{t-}$ \textbf{in parallel}} \label{alg:frontier--loopdel-begin}
+    \If{$C^{t-1}[i] = C^{t-1}[j]$} $\delta V[i] \gets 1$
+    \EndIf
+  \EndFor \label{alg:frontier--loopdel-end}
+  \ForAll{$(i, j, w) \in \Delta^{t+}$ \textbf{in parallel}} \label{alg:frontier--loopins-begin}
+    \If{$C^{t-1}[i] \neq C^{t-1}[j]$} $\delta V[i] \gets 1$
+    \EndIf
+  \EndFor \label{alg:frontier--loopins-end}
+  \Function{isAffected}{$i$} \label{alg:frontier--isaff-begin}
+    \Return{$\delta V[i]$}
+  \EndFunction \label{alg:frontier--isaff-end}
+  \Function{inAffectedRange}{$i$} \label{alg:frontier--isaffrng-begin}
+    \Return{$1$}
+  \EndFunction \label{alg:frontier--isaffrng-end}
+  \Function{onChange}{$i$} \label{alg:frontier--onchg-begin}
+    \ForAll{$j \in G^t.neighbors(i)$} $\delta V[j] \gets 1$
+    \EndFor
+  \EndFunction \label{alg:frontier--onchg-end}
+  \State $F \gets \{isAffected, inAffectedRange, onChange\}$ \label{alg:frontier--lambdas}
+  \State $\rhd$ Use $K^{t-1}$, $\Sigma^{t-1}$ as auxiliary information (Alg. \ref{alg:update})
+  \State $\{K^t, \Sigma^t\} \gets updateWeights(G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1})$\label{alg:frontier--auxiliary}
+  \State $\rhd$ Obtain updated communities (Alg. \ref{alg:leiden})
+  \State $C^t \gets leiden(G^t, C^{t-1}, K^t, \Sigma^t, F)$ \label{alg:frontier--leiden}
+  \Return{$\{C^t, K^t, \Sigma^t\}$} \label{alg:frontier--return}
+\EndFunction
+\end{algorithmic}
+\end{algorithm}

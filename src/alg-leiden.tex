@@ -1,0 +1,56 @@
+\begin{algorithm}[hbtp]
+\caption{Our Dynamic-supporting Parallel Leiden \cite{sahu2024dflouvain}.}
+\label{alg:leiden}
+\begin{algorithmic}[1]
+\Require{$G^t$: Current input graph}
+\Require{$C^{t-1}$: Previous community of each vertex}
+\Require{$K^t$: Current weighted-degree of each vertex}
+\Require{$\Sigma^t$: Current total edge weight of each community}
+\Require{$F$: Lambda functions passed to parallel Leiden}
+\Ensure{$G'$: Current/super-vertex graph.}
+\Ensure{$C, C'$: Current community of each vertex in $G^t$, $G'$}
+\Ensure{$K, K'$: Current weighted-degree of each vertex in $G^t$, $G'$}
+\Ensure{$\Sigma, \Sigma'$: Current total edge weight of each community in $G^t$, $G'$}
+\Ensure{$\tau, \tau_{agg}$: Iteration, aggregation tolerance}
+
+\Statex
+
+\Function{leiden}{$G^t, C^{t-1}, K^t, \Sigma^t, F$} \label{alg:leiden--begin}
+  \State $\rhd$ Mark affected vertices as unprocessed
+  \ForAll{$i \in V^t$} \label{alg:leiden--mark-begin}
+    \If{$F.isAffected(i)$} Mark $i$ as unprocessed
+    \EndIf
+  \EndFor \label{alg:leiden--mark-end}
+  \State $\rhd$ Initialization phase
+  \State Vertex membership: $C \gets [0 .. |V^t|)$ \label{alg:leiden--init-begin}
+  \State $G' \gets G^t$ \textbf{;} $C' \gets C^{t-1}$ \textbf{;} $K' \gets K^t$ \textbf{;} $\Sigma' \gets \Sigma^t$ \label{alg:leiden--init-end}
+  \State $\rhd$ Local-moving and aggregation phases
+  \ForAll{$l_p \in [0 .. \text{\small{MAX\_PASSES}})$} \label{alg:leiden--passes-begin}
+    \State $l_i \gets leidenMove(G', C', K', \Sigma', F)$ \Comment{Alg. \ref{alg:leidenlm}} \label{alg:leiden--local-move}
+    \If{$l_i \le 1$} \textbf{break} \Comment{Globally converged?} \label{alg:leiden--globally-converged}
+    \EndIf
+    \State $|\Gamma|, |\Gamma_{old}| \gets$ Number of communities in $C$, $C'$
+    \If{$|\Gamma|/|\Gamma_{old}| > \tau_{agg}$} \textbf{break} \Comment{Low shrink?} \label{alg:leiden--aggregation-tolerance}
+    \EndIf
+    \State $C' \gets$ Renumber communities in $C'$ \label{alg:leiden--renumber}
+    \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup}
+    \State $G' \gets$ Aggregate communities in $G'$ using $C'$ \Comment{Alg. \ref{alg:leidenag}} \label{alg:leiden--aggregate}
+    \State $\Sigma' \gets K' \gets$ Weight of each vertex in $G'$ \label{alg:leiden--reset-weights}
+    \State Mark all vertices in $G'$ as unprocessed \label{alg:leiden--reset-affected}
+    \State $C' \gets [0 .. |V'|)$
+    \State $\tau \gets \tau / \text{\small{TOLERANCE\_DROP}}$ \Comment{Threshold scaling} \label{alg:leiden--threshold-scaling}
+  \EndFor \label{alg:leiden--passes-end}
+  \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup-last}
+  \Return{$C$} \label{alg:leiden--return}
+\EndFunction \label{alg:leiden--end}
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+%% Parameter setting
+% $\tau \gets TOLERANCE\_INITIAL$
+% TOLERANCE\_INITIAL = 0.01
+% TOLERANCE\_DECLINE = 10
+% MAX\_PASSES = 500
