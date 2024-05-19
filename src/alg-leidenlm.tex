@@ -1,5 +1,5 @@
 \begin{algorithm}[hbtp]
-\caption{Local-moving phase of our Parallel Leiden \cite{sahu2024dflouvain}.}
+\caption{Local-moving phase of our Parallel Leiden \cite{sahu2023gveleiden}.}
 \label{alg:leidenlm}
 \begin{algorithmic}[1]
 \Require{$G'$: Input/super-vertex graph}
@@ -40,8 +40,9 @@
 
 \Function{scanCommunities}{$H_t, G', C', i, self$}
   \ForAll{$(j, w) \in G'.edges(i)$}
-    \If{$self$ \textbf{or} $i \neq j$} $H_t \gets H_t[C'[j]] + w$
+    \If{\textbf{not} $self$ \textbf{and} $i = j$} \textbf{continue}
     \EndIf
+    \State $H_t[C'[j]] \gets H_t[C'[j]] + w$
   \EndFor
   \Return{$H_t$}
 \EndFunction

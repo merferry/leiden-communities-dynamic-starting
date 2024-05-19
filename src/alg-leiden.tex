@@ -1,5 +1,5 @@
 \begin{algorithm}[hbtp]
-\caption{Our Dynamic-supporting Parallel Leiden \cite{sahu2024dflouvain}.}
+\caption{Our Dynamic-supporting Parallel Leiden \cite{sahu2023gveleiden}.}
 \label{alg:leiden}
 \begin{algorithmic}[1]
 \Require{$G^t$: Current input graph}
@@ -27,17 +27,20 @@
   \State $\rhd$ Local-moving and aggregation phases
   \ForAll{$l_p \in [0 .. \text{\small{MAX\_PASSES}})$} \label{alg:leiden--passes-begin}
     \State $l_i \gets leidenMove(G', C', K', \Sigma', F)$ \Comment{Alg. \ref{alg:leidenlm}} \label{alg:leiden--local-move}
-    \If{$l_i \le 1$} \textbf{break} \Comment{Globally converged?} \label{alg:leiden--globally-converged}
+    \State $C'_B \gets C'$ \textbf{;} $C' \gets [0 .. |V'|)$ \textbf{;} $\Sigma' \gets K'$ \label{alg:leiden--reset-again}
+    \State $l_j \gets leidenRefine(G', C'_B, C', K', \Sigma', \tau)$ \Comment{Alg. \ref{alg:leidenre}} \label{alg:leiden--refine}
+    \If{\textbf{not} first pass \textbf{and} $l_i + l_j \le 1$} \textbf{break} \Comment{Done?} \label{alg:leiden--globally-converged}
     \EndIf
     \State $|\Gamma|, |\Gamma_{old}| \gets$ Number of communities in $C$, $C'$
     \If{$|\Gamma|/|\Gamma_{old}| > \tau_{agg}$} \textbf{break} \Comment{Low shrink?} \label{alg:leiden--aggregation-tolerance}
     \EndIf
     \State $C' \gets$ Renumber communities in $C'$ \label{alg:leiden--renumber}
     \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup}
-    \State $G' \gets$ Aggregate communities in $G'$ using $C'$ \Comment{Alg. \ref{alg:leidenag}} \label{alg:leiden--aggregate}
+    \State $G' \gets leidenAggregate(G', C')$ \Comment{Alg. \ref{alg:leidenag}} \label{alg:leiden--aggregate}
     \State $\Sigma' \gets K' \gets$ Weight of each vertex in $G'$ \label{alg:leiden--reset-weights}
     \State Mark all vertices in $G'$ as unprocessed \label{alg:leiden--reset-affected}
-    \State $C' \gets [0 .. |V'|)$
+    \State $C' \gets [0 .. |V'|)$ \Comment{Use refine-based membership} \label{alg:leiden--useparent}
+    % \State $C' \gets$ Map $C'$ to $C'_B$ \Comment{Use move-based membership} \label{alg:leiden--useparent}
     \State $\tau \gets \tau / \text{\small{TOLERANCE\_DROP}}$ \Comment{Threshold scaling} \label{alg:leiden--threshold-scaling}
   \EndFor \label{alg:leiden--passes-end}
   \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup-last}
