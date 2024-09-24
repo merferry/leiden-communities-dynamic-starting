@@ -70,6 +70,13 @@ The pseudocode for the aggregation phase is presented in Algorithm \ref{alg:leid
 In the algorithm, the process initiates by acquiring the offsets array for the community vertices CSR $G'_{C'}.offsets$ within lines \ref{alg:leidenag--coff-begin}-\ref{alg:leidenag--coff-end}. Initially, this involves tallying the number of vertices associated with each community using \texttt{countCommunityVertices()}, followed by executing an exclusive scan operation on the array. Subsequently, within lines \ref{alg:leidenag--comv-begin}-\ref{alg:leidenag--comv-end}, we concurrently traverse all vertices, atomically assigning vertices linked with each community into the community graph CSR $G'_{C'}$. Moving forward, we determine the offsets array for the super-vertex graph CSR by approximating the degree of each super-vertex within lines \ref{alg:leidenag--yoff-begin}-\ref{alg:leidenag--yoff-end}. This involves computing the cumulative degree of each community utilizing \texttt{communityTotalDegree()} followed by executing an exclusive scan on the array. Consequently, the super-vertex graph CSR displays intervals between the edges and weights array of each super-vertex. Subsequent to this, within lines \ref{alg:leidenag--y-begin}-\ref{alg:leidenag--y-end}, we iterate over all communities $c \in [0, |\Gamma|)$. Here, we include all communities $d$ (alongside their respective edge weight $w$) connected to each vertex $i$ belonging to community $c$ (through \texttt{scanCommunities()} as defined in Algorithm \ref{alg:leidenlm}) into the per-thread hashtable $H_t$. Upon $H_t$ containing all communities (with their weights) linked to community $c$, we atomically append them as edges to super-vertex $c$ within the super-vertex graph $G''$. Ultimately, in line \ref{alg:leidenag--return}, we return\ignore{the super-vertex graph} $G''$.
 
 
+
+
+\input{src/alg-leidensr}
+
+
+
+
 \subsection{Updating vertex/community weights}
 \label{sec:our-update}
 

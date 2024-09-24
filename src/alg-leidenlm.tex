@@ -6,6 +6,7 @@
 \Require{$C'$: Community membership of each vertex}
 \Require{$K'$: Total edge weight of each vertex}
 \Require{$\Sigma'$: Total edge weight of each community}
+\Require{$\Delta C'$: Changed communities flag}
 \Require{$F$: Lambda functions passed to parallel Leiden}
 \Ensure{$H_t$: Collision-free per-thread hashtable}
 \Ensure{$l_i$: Number of iterations performed}
@@ -13,7 +14,7 @@
 
 \Statex
 
-\Function{leidenMove}{$G', C', K', \Sigma', F$} \label{alg:leidenlm--move-begin}
+\Function{leidenMove}{$G', C', K', \Sigma', \Delta C', F$} \label{alg:leidenlm--move-begin}
   \ForAll{$l_i \in [0 .. \text{\small{MAX\_ITERATIONS}})$} \label{alg:leidenlm--iterations-begin}
     \State Total delta-modularity per iteration: $\Delta Q \gets 0$ \label{alg:leidenlm--init-deltaq}
     \ForAll{unprocessed $i \in V'$ \textbf{in parallel}} \label{alg:leidenlm--loop-vertices-begin}
@@ -29,6 +30,8 @@
       \State $\Sigma'[C'[i]] -= K'[i]$ \textbf{;} $\Sigma'[c^*] += K'[i]$ \textbf{atomic} \label{alg:leidenlm--perform-move-begin}
       \State $C'[i] \gets c^*$ \textbf{;} $\Delta Q \gets \Delta Q + \delta Q^*$ \label{alg:leidenlm--perform-move-end}
       \State Mark neighbors of $i$ as unprocessed \label{alg:leidenlm--remark}
+      \If{\textbf{is dynamic alg.}} $\Delta C'[c] \gets \Delta C'[c^*] \gets 1$ \label{alg:leidenlm--mark-changed-communities}
+      \EndIf
     \EndFor \label{alg:leidenlm--loop-vertices-end}
     \If{$\Delta Q \le \tau$} \textbf{break} \Comment{Locally converged?} \label{alg:leidenlm--locally-converged}
     \EndIf

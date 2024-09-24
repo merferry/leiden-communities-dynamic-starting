@@ -3,11 +3,12 @@
 \label{alg:leiden}
 \begin{algorithmic}[1]
 \Require{$G^t$: Current input graph}
+\Require{$\Delta^{t-}, \Delta^{t+}$: Edge deletions and insertions (batch update)}
 \Require{$C^{t-1}$: Previous community of each vertex}
 \Require{$K^t$: Current weighted-degree of each vertex}
 \Require{$\Sigma^t$: Current total edge weight of each community}
 \Require{$F$: Lambda functions passed to parallel Leiden}
-\Ensure{$G'$: Current/super-vertex graph.}
+\Ensure{$G'$: Current/super-vertex graph}
 \Ensure{$C, C'$: Current community of each vertex in $G^t$, $G'$}
 \Ensure{$K, K'$: Current weighted-degree of each vertex in $G^t$, $G'$}
 \Ensure{$\Sigma, \Sigma'$: Current total edge weight of each community in $G^t$, $G'$}
@@ -24,10 +25,13 @@
   \State $\rhd$ Initialization phase
   \State Vertex membership: $C \gets [0 .. |V^t|)$ \label{alg:leiden--init-begin}
   \State $G' \gets G^t$ \textbf{;} $C' \gets C^{t-1}$ \textbf{;} $K' \gets K^t$ \textbf{;} $\Sigma' \gets \Sigma^t$ \label{alg:leiden--init-end}
+  \State $\Delta C' \gets changedCommunities(G^t, C^{t-1}, \Delta^{t-}, \Delta^{t+})$ \label{alg:leiden--get-changed-communities}
   \State $\rhd$ Local-moving and aggregation phases
   \ForAll{$l_p \in [0 .. \text{\small{MAX\_PASSES}})$} \label{alg:leiden--passes-begin}
-    \State $l_i \gets leidenMove(G', C', K', \Sigma', F)$ \Comment{Alg. \ref{alg:leidenlm}} \label{alg:leiden--local-move}
-    \State $C'_B \gets C'$ \textbf{;} $C' \gets [0 .. |V'|)$ \textbf{;} $\Sigma' \gets K'$ \label{alg:leiden--reset-again}
+    \State $l_i \gets leidenMove(G', C', K', \Sigma', \Delta C', F)$ \Comment{Alg. \ref{alg:leidenlm}} \label{alg:leiden--local-move}
+    \State $leidenSubsetRenumber(G', C', \Sigma', \Delta C')$ \Comment{Alg. \ref{alg:leidensr}} \label{alg:leiden-subset-renumber}
+    \State $C'_B \gets C'$ \Comment{Community bounds for refinement phase}
+    \State $breakChangedCommunities(G', C', K', \Sigma', \Delta C')$ \label{alg:leiden--reset-again}
     \State $l_j \gets leidenRefine(G', C'_B, C', K', \Sigma', \tau)$ \Comment{Alg. \ref{alg:leidenre}} \label{alg:leiden--refine}
     \If{\textbf{not} first pass \textbf{and} $l_i + l_j \le 1$} \textbf{break} \Comment{Done?} \label{alg:leiden--globally-converged}
     \EndIf
@@ -40,12 +44,37 @@
     \State $\Sigma' \gets K' \gets$ Weight of each vertex in $G'$ \label{alg:leiden--reset-weights}
     \State Mark all vertices in $G'$ as unprocessed \label{alg:leiden--reset-affected}
     \State $C' \gets [0 .. |V'|)$ \Comment{Use refine-based membership} \label{alg:leiden--useparent}
+    \State $\Delta C' \gets \{1\ \forall\ V'\}$ \Comment{Refine all communities next pass} \label{alg:leiden--all-communities-changed}
     % \State $C' \gets$ Map $C'$ to $C'_B$ \Comment{Use move-based membership} \label{alg:leiden--useparent}
     \State $\tau \gets \tau / \text{\small{TOLERANCE\_DROP}}$ \Comment{Threshold scaling} \label{alg:leiden--threshold-scaling}
   \EndFor \label{alg:leiden--passes-end}
   \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup-last}
   \Return{$C$} \label{alg:leiden--return}
 \EndFunction \label{alg:leiden--end}
+
+\Statex
+
+\Function{changedCommunities}{$G^t, C^{t-1}, \Delta^{t-}, \Delta^{t+}$}
+  \State $\Delta C' \gets \{\}$
+  \If{\textbf{is dynamic alg.}}
+    \ForAll{$(i, j) \in \Delta^{t-} \cup \Delta^{t+}$ \textbf{in parallel}}
+      \If{$C^{t-1}[i] = C^{t-1}[j]$} $\Delta C'[i] \gets 1$
+      \EndIf
+    \EndFor
+  \Else\ $\Delta C' \gets \{1\ \forall\ V^t\}$
+  \EndIf
+  \Return{$\Delta C'$}
+\EndFunction
+
+\Statex
+
+\Function{breakChangedCommunities}{$G', C', K', \Sigma', \Delta C'$}
+  \ForAll{$i \in V'$ \textbf{in parallel}}
+    \If{$\Delta C'[C'[i]] = 0$} \textbf{continue}
+    \EndIf
+    \State $C'[i] \gets i$ \textbf{;} $\Sigma'[i] \gets K'[i]$
+  \EndFor
+\EndFunction
 \end{algorithmic}
 \end{algorithm}
 

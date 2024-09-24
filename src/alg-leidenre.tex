@@ -3,25 +3,27 @@
 \label{alg:leidenre}
 \begin{algorithmic}[1]
 \Require{$G'$: Input/super-vertex graph}
+\Require{$C'_B$: Community bound of each vertex}
 \Require{$C'$: Community membership of each vertex}
 \Require{$K'$: Total edge weight of each vertex}
 \Require{$\Sigma'$: Total edge weight of each community}
+\Require{$\Delta C'$: Community changed flag}
 \Ensure{$G'_{C'}$: Community vertices (CSR)}
 \Ensure{$H_t$: Collision-free per-thread hashtable}
 \Ensure{$\tau$: Per iteration tolerance}
 
 \Statex
 
-\Function{leidenRefine}{$G', C'_B, C', K', \Sigma', \tau$} \label{alg:leidenre--move-begin}
+\Function{leidenRefine}{$G', C'_B, C', K', \Sigma', \Delta C', \tau$} \label{alg:leidenre--move-begin}
   \ForAll{$i \in V'$ \textbf{in parallel}} \label{alg:leidenre--loop-vertices-begin}
     \State $c \gets C'[i]$
-    \If{$\Sigma'[c] \neq K'[i]$} \textbf{continue} \label{alg:leidenre--check-isolated}
+    \If{$\Delta C'[c] = 0$ \textbf{or} $\Sigma'[c] \neq K'[i]$} \textbf{continue} \label{alg:leidenre--check-isolated}
     \EndIf
     \State $H_t \gets scanBounded(\{\}, G', C'_B, C', i, false)$ \label{alg:leidenre--scan}
     \State $\rhd$ Use $H_t, K', \Sigma'$ to choose best community
     \State $c^* \gets$ Best community linked to $i$ in $G'$ within $C'_B$ \label{alg:leidenre--best-community-begin}
     \State $\delta Q^* \gets$ Delta-modularity of moving $i$ to $c^*$ \label{alg:leidenre--best-community-end}
-    \If{$c^* = c$} \textbf{continue} \label{alg:leidenre--best-community-same}
+    \If{$c^* = c$ \textbf{or} $C'[c^*] \neq c^* $} \textbf{continue} \label{alg:leidenre--best-community-same}
     \EndIf
     \If{$atomicCAS(\Sigma'[c], K'[i], 0) = K'[i]$} \label{alg:leidenre--perform-move-begin}
       \State $\Sigma'[c^*] += K'[i]$ \textbf{atomically}

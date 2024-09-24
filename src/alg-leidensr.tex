@@ -1,0 +1,37 @@
+\begin{algorithm}[hbtp]
+\caption{Renumber communities by ID of a vertex within.}
+\label{alg:leidensr}
+\begin{algorithmic}[1]
+\Require{$G'$: Input/super-vertex graph}
+\Require{$C', C''$: Current, updated community membership of vertices}
+\Require{$\Sigma', \Sigma''$: Current, updated total edge weight of each community}
+\Require{$\Delta C', \Delta C''$: Current, updated changed communities flag}
+\Ensure{$\Gamma'$: Set of communities in $C'$}
+
+\Statex
+
+\Function{leidenSubsetRenumber}{$G', C', \Sigma', \Delta C'$}
+  \State $C'' \gets \Sigma'' \gets \Delta C'' \gets C'_v \gets \{\}$ \label{alg:leidensr--init}
+  \State $\rhd$ Obtain any vertex from each community
+  \ForAll{$i \in V'$ \textbf{in parallel}}
+    \State $c' \gets C'[i]$
+    \If{$C'_v[c] = \text{EMPTY}$} $C'_v[c] \gets i$
+    \EndIf
+  \EndFor
+  \State $\rhd$ Update community weights and changed status
+  \ForAll{$c' \in \Gamma'$ \textbf{in parallel}}
+    \State $c'' \gets C'_v[c']$
+    \If{$c'' \neq \text{EMPTY}$}
+      \State $\Sigma''[c''] \gets \Sigma'[c']$
+      \State $\Delta C''[c''] \gets \Delta C'[c']$
+    \EndIf
+  \EndFor
+  \State $\rhd$ Update community memberships
+  \ForAll{$i \in V'$ \textbf{in parallel}}
+    \State $C''[i] \gets C'_v[C'[i]]$
+  \EndFor
+  \State $\rhd$ Update in-place
+  \State $C' \gets C''$ \textbf{;} $\Sigma' \gets \Sigma''$ \textbf{;} $\Delta C' \gets \Delta C''$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
