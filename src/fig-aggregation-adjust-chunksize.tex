@@ -1,0 +1,17 @@
+\begin{figure}[!hbt]
+  \centering
+  \subfigure[On uniformly batch updates of size $10^{-7}|E|$]{
+    \label{fig:aggregation-adjust-chunksize--batch7}
+    \includegraphics[width=0.98\linewidth]{out/aggregation-adjust-chunksize7.pdf}
+  }
+  \subfigure[On uniformly batch updates of size $10^{-5}|E|$]{
+    \label{fig:aggregation-adjust-chunksize--batch5}
+    \includegraphics[width=0.98\linewidth]{out/aggregation-adjust-chunksize5.pdf}
+  }
+  \subfigure[On uniformly batch updates of size $10^{-3}|E|$]{
+    \label{fig:aggregation-adjust-chunksize--batch3}
+    \includegraphics[width=0.98\linewidth]{out/aggregation-adjust-chunksize3.pdf}
+  } \\[-2ex]
+  \caption{Mean Runtime and Modularity of communities obtained with our multicore implementation of \textit{Static}, \textit{Naive-dynamic (ND)}, \textit{Delta-screening (DS)}, and \textit{Dynamic Frontier (DF)} Leiden on real-world dynamic graphs, using batch updates of size $10^{-5}|E_T|$ to $10^{-3}|E_T|$. Here, (a) and (b) display the overall runtime and modularity across all temporal graphs.}
+  \label{fig:aggregation-adjust-chunksize}
+\end{figure}

@@ -17,3 +17,6 @@ The Delta-screening (DS) approach proposed by Zarayeneh et al. \cite{com-zarayen
 \subsection{Extending the Dynamic Frontier (DF) approach to Parallel Leiden algorithm}
 
 Our prior study \cite{sahu2024dflouvain} presented a parallel implementation of the Dynamic Frontier (DF) approach, which, as above, utilized per-thread collision-free hash tables and capitalized on the weighted degrees of vertices and the total edge weights of communities as auxiliary information. In this work, we expand upon this, by applying it to Parallel Leiden\ignore{\cite{sahu2023gveleiden}} instead. The pseudocode for this is outlined in Algorithm \ref{alg:delta}, accompanied by an explanation provided in Section \ref{sec:our-delta}. Similar to our DS Leiden counterpart, it processes the (incrementally) marked vertices during the local-moving phase, but operates on all vertices during the refinement phase\ignore{(of the first pass)} of Leiden algorithm.
+
+\input{src/fig-optimize-subrefine}
+\input{src/fig-aggregation-adjust-chunksize}
