@@ -2,7 +2,7 @@
 \caption{Our Parallel \textit{Naive-dynamic (ND)} Leiden \cite{sahu2024dflouvain}.}
 \label{alg:naive}
 \begin{algorithmic}[1]
-\Require{$G^{t-1}, G^t$: Previous, current input graph}
+\Require{$G^t(V^t, E^t)$: Current/updated input graph}
 \Require{$\Delta^{t-}, \Delta^{t+}$: Edge deletions and insertions (batch update)}
 \Require{$C^{t-1}, C^t$: Previous, current community of each vertex}
 \Require{$K^{t-1}, K^t$: Previous, current weighted-degree of vertices}
@@ -13,7 +13,7 @@
 
 \Statex
 
-\Function{naiveDynamic}{$G^{t-1}, G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1}$}
+\Function{naiveDynamic}{$G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1}$}
   \State $\rhd$ Mark affected vertices
   \Function{isAffected}{$i$} \label{alg:naive--isaff-begin}
     \Return{$1$}

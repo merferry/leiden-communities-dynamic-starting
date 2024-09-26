@@ -2,7 +2,7 @@
 \caption{Our Parallel \textit{Dynamic Frontier (DF)} Leiden \cite{sahu2024dflouvain}.}
 \label{alg:frontier}
 \begin{algorithmic}[1]
-\Require{$G^{t-1}, G^t$: Previous, current input graph}
+\Require{$G^t(V^t, E^t)$: Current/updated input graph}
 \Require{$\Delta^{t-}, \Delta^{t+}$: Edge deletions and insertions (batch update)}
 \Require{$C^{t-1}, C^t$: Previous, current community of each vertex}
 \Require{$K^{t-1}, K^t$: Previous, current weighted-degree of vertices}
@@ -15,7 +15,7 @@
 
 \Statex
 
-\Function{dynamicFrontier}{$G^{t-1}, G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1}$}
+\Function{dynamicFrontier}{$G^t, \Delta^{t-}, \Delta^{t+}, C^{t-1}, K^{t-1}, \Sigma^{t-1}$}
   \State $\rhd$ Mark initial affected vertices
   \ForAll{$(i, j) \in \Delta^{t-}$ \textbf{in parallel}} \label{alg:frontier--loopdel-begin}
     \If{$C^{t-1}[i] = C^{t-1}[j]$} $\delta V[i] \gets 1$

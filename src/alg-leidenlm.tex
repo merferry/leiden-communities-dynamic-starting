@@ -2,7 +2,7 @@
 \caption{Local-moving phase of our Parallel Leiden \cite{sahu2023gveleiden}.}
 \label{alg:leidenlm}
 \begin{algorithmic}[1]
-\Require{$G'$: Input/super-vertex graph}
+\Require{$G'(V', E')$: Input/super-vertex graph}
 \Require{$C'$: Community membership of each vertex}
 \Require{$K'$: Total edge weight of each vertex}
 \Require{$\Sigma'$: Total edge weight of each community}
@@ -30,7 +30,7 @@
       \State $\Sigma'[C'[i]] -= K'[i]$ \textbf{;} $\Sigma'[c^*] += K'[i]$ \textbf{atomic} \label{alg:leidenlm--perform-move-begin}
       \State $C'[i] \gets c^*$ \textbf{;} $\Delta Q \gets \Delta Q + \delta Q^*$ \label{alg:leidenlm--perform-move-end}
       \State Mark neighbors of $i$ as unprocessed \label{alg:leidenlm--remark}
-      \If{\textbf{is dynamic alg.}} $\Delta C'[c] \gets \Delta C'[c^*] \gets 1$ \label{alg:leidenlm--mark-changed-communities}
+      \If{is dynamic alg.} $\Delta C'[c] \gets \Delta C'[c^*] \gets 1$ \label{alg:leidenlm--mark-changed-communities}
       \EndIf
     \EndFor \label{alg:leidenlm--loop-vertices-end}
     \If{$\Delta Q \le \tau$} \textbf{break} \Comment{Locally converged?} \label{alg:leidenlm--locally-converged}
