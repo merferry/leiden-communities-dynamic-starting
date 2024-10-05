@@ -1,5 +1,5 @@
 \begin{algorithm}[hbtp]
-\caption{Local-moving phase of our Parallel Leiden \cite{sahu2023gveleiden}.}
+\caption{Local-moving phase of our Parallel Leiden \cite{sahu2024fast}.}
 \label{alg:leidenlm}
 \begin{algorithmic}[1]
 \Require{$G'(V', E')$: Input/super-vertex graph}
@@ -15,7 +15,7 @@
 \Statex
 
 \Function{leidenMove}{$G', C', K', \Sigma', \Delta C', F$} \label{alg:leidenlm--move-begin}
-  \ForAll{$l_i \in [0 .. \text{\small{MAX\_ITERATIONS}})$} \label{alg:leidenlm--iterations-begin}
+  \ForAll{$l_i \in [0 .. \text{MAX\_ITERATIONS})$} \label{alg:leidenlm--iterations-begin}
     \State Total delta-modularity per iteration: $\Delta Q \gets 0$ \label{alg:leidenlm--init-deltaq}
     \ForAll{unprocessed $i \in V'$ \textbf{in parallel}} \label{alg:leidenlm--loop-vertices-begin}
       \State Mark $i$ as processed (prune) \label{alg:leidenlm--prune}

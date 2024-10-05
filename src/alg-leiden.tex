@@ -1,5 +1,5 @@
 \begin{algorithm}[hbtp]
-\caption{Our Dynamic-supporting Parallel Leiden \cite{sahu2023gveleiden}.}
+\caption{Our Dynamic-supporting Parallel Leiden \cite{sahu2024fast}.}
 \label{alg:leiden}
 \begin{algorithmic}[1]
 \Require{$G^t(V^t, E^t)$: Current input graph}
@@ -12,8 +12,8 @@
 \Ensure{$C, C'$: Current community of each vertex in $G^t$, $G'$}
 \Ensure{$K, K'$: Current weighted-degree of each vertex in $G^t$, $G'$}
 \Ensure{$\Sigma, \Sigma'$: Current total edge weight of each community in $G^t$, $G'$}
-\Require{$C'_B$: Community bound of each vertex}
-\Require{$\Delta C'$: Changed communities flag}
+\Ensure{$C'_B$: Community bound of each vertex}
+\Ensure{$\Delta C'$: Changed communities flag}
 \Ensure{$\tau$: Iteration tolerance}
 
 \Statex
@@ -29,7 +29,7 @@
   \State $G' \gets G^t$ \textbf{;} $C' \gets C^{t-1}$ \textbf{;} $K' \gets K^t$ \textbf{;} $\Sigma' \gets \Sigma^t$
   \State $\Delta C' \gets changedCommunities(G^t, C^{t-1}, \Delta^{t-}, \Delta^{t+})$ \label{alg:leiden--init-end}
   \State $\rhd$ Local-moving and aggregation phases
-  \ForAll{$l_p \in [0 .. \text{\small{MAX\_PASSES}})$} \label{alg:leiden--passes-begin}
+  \ForAll{$l_p \in [0 .. \text{MAX\_PASSES})$} \label{alg:leiden--passes-begin}
     \State $l_i \gets leidenMove(G', C', K', \Sigma', \Delta C', F)$ \Comment{Alg. \ref{alg:leidenlm}} \label{alg:leiden--local-move}
     \State $leidenSubsetRenumber(G', C', \Sigma', \Delta C')$ \Comment{Alg. \ref{alg:leidensr}} \label{alg:leiden-subset-renumber}
     \State $C'_B \gets C'$ \Comment{Community bounds for refinement phase}
@@ -48,7 +48,7 @@
     \State $C' \gets [0 .. |V'|)$ \Comment{Use refine-based membership} \label{alg:leiden--useparent}
     \State $\Delta C' \gets \{1\ \forall\ V'\}$ \Comment{Refine all communities next pass} \label{alg:leiden--all-communities-changed}
     % \State $C' \gets$ Map $C'$ to $C'_B$ \Comment{Use move-based membership} \label{alg:leiden--useparent}
-    \State $\tau \gets \tau / \text{\small{TOLERANCE\_DROP}}$ \Comment{Threshold scaling} \label{alg:leiden--threshold-scaling}
+    \State $\tau \gets \tau / \text{TOLERANCE\_DROP}$ \Comment{Threshold scaling} \label{alg:leiden--threshold-scaling}
   \EndFor \label{alg:leiden--passes-end}
   \State $C \gets$ Lookup dendrogram using $C$ to $C'$ \label{alg:leiden--lookup-last}
   \Return{$C$} \label{alg:leiden--return}
