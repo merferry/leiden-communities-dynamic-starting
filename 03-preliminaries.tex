@@ -5,7 +5,7 @@ Let $G(V, E, w)$ represent an undirected graph, where $V$ denotes the set of ver
 
 \subsection{Community detection}
 
-Disjoint community detection involves finding a community membership mapping, $C: V \rightarrow \Gamma$, which maps each vertex $i \in V$ to a community ID $c \in \Gamma$, where $\Gamma$ is the set of community-ids. The vertices within a community $c$ are denoted as $V_c$, and the community to which a vertex $i$ belongs is denoted as $C_i$. Furthermore, we define the neighbors of vertex $i$ belonging to a community $c$ as $J_{i \rightarrow c} = \{j\ |\ j \in J_i\ and\ C_j = c\}$, the sum of those edge weights as $K_{i \rightarrow c} = \{w_{ij}\ |\ j \in J_{i \rightarrow c}\}$, the sum of edge weights within $c$ as $\sigma_c = \sum_{(i, j) \in E\ and\ C_i = C_j = c} w_{ij}$, and the total edge weight of $c$ as $\Sigma_c = \sum_{(i, j) \in E\ \mbox{and}\ C_i = c} w_{ij}$ \cite{com-zarayeneh21}.
+Disjoint community detection involves finding a community membership mapping, $C: V \rightarrow \Gamma$, which maps each vertex $i \in V$ to a community ID $c \in \Gamma$, where $\Gamma$ is the set of community-ids. The vertices within a community $c$ are denoted as $V_c$, and the community to which a vertex $i$ belongs is denoted as $C_i$. Furthermore, we define the neighbors of vertex $i$ belonging to a community $c$ as $J_{i \rightarrow c} = \{j\ |\ j \in J_i\ and\ C_j = c\}$, the sum of those edge weights as $K_{i \rightarrow c} = \{w_{ij}\ |\ j \in J_{i \rightarrow c}\}$, the sum of edge weights within $c$ as $\sigma_c = \sum_{(i, j) \in E\ and\ C_i = C_j = c} w_{ij}$, and the total edge weight of $c$ as $\Sigma_c = \sum_{(i, j) \in E\ and\ C_i = c} w_{ij}$ \cite{com-zarayeneh21}.
 
 
 
@@ -34,7 +34,7 @@ Modularity is a metric used to assess the quality of communities identified by c
 \subsection{Louvain algorithm}
 \label{sec:about-Louvain}
 
-The Louvain method is a greedy, modularity optimization based agglomerative algorithm for detecting communities of high quality in a graph. It works in two phases: in the local-moving phase, each vertex $i$ considers moving to a neighboring community $C_j\ |\ j \in J_i$ to maximize modularity increase $\Delta Q_{i:C_i \rightarrow C_j}$. In the aggregation phase, vertices in the same community are merged into super-vertices. These phases constitute a pass, and repeat until modularity gain stops. This produces a hierarchical structure (dendrogram), with the top level representing the final communities.
+The Louvain method is a greedy, modularity optimization based agglomerative algorithm for detecting communities of high quality in a graph. It works in two phases: in the local-moving phase, each vertex $i$ considers moving to a neighboring community $\{C_j\ |\ j \in J_i\}$ to maximize modularity increase $\Delta Q_{i:C_i \rightarrow C_j}$. In the aggregation phase, vertices in the same community are merged into super-vertices. These phases constitute a pass, and repeat until modularity gain stops. This produces a hierarchical structure (dendrogram), with the top level representing the final communities.
 % As mentioned earlier, the Louvain method is a greedy, modularity optimization-based agglomerative algorithm that identifies high-quality communities within a graph \cite{com-lancichinetti09}. The method operates in two phases\ignore{: the local-moving phase and the aggregation phase}. In the local-moving phase, each vertex $i$ evaluates moving to the community of one of its neighbors $j \in J_i$ that maximizes the increase in modularity $\Delta Q_{i:C_i \rightarrow C_j}$ (using Equation \ref{eq:delta-modularity}). In the aggregation phase, all vertices within the same community are collapsed into a super-vertex. These two phases constitute one pass, which is repeated until there is no further gain in modularity. The method produces a hierarchy of community memberships for each vertex, forming a dendrogram, with the top-level\ignore{hierarchy} representing the final communities.
 
 
@@ -74,4 +74,5 @@ This approach first initializes each vertex's community membership to that obtai
 % When processing a batch update containing edge deletions $(i, j, w) \in \Delta^{t-}$ and insertions $(i, j, w) \in \Delta^{t+}$ upon the original graph, it is likely that only a small subset of vertices in the graph would undergo a change in their community membership. However, the ND approach processes all vertices, while the DS approach tends to overestimate the set of affected vertices, while incurring a high overhead in estimating the set of affected vertices.
 % This optimization, referred to as vertex pruning \cite{com-ozaki16, com-ryu16, com-shi21, com-zhang21}.
 
+\input{src/tab-terminology}
 \input{src/fig-about-cases}
